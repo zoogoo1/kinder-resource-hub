@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kindergarten Resource Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red:    #C0392B;
+    --blue:   #1A6B8A;
+    --green:  #27AE60;
+    --purple: #8E44AD;
+    --orange: #D35400;
+    --amber:  #B7950B;
+    --teal:   #16A085;
+    --navy:   #2C3E50;
+    --bg:     #FDF6EC;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--navy); }
+
+  /* NAV */
+  nav {
+    background: var(--navy); padding: 0 28px; height: 54px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+  }
+  .nav-logo { font-family: 'Fredoka One', cursive; font-size: 1.35rem; color: #fff; }
+  .nav-logo span { color: #F1C40F; }
+  .nav-links { display: flex; gap: 6px; }
+  .nav-links a {
+    color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.82rem;
+    font-weight: 700; padding: 5px 12px; border-radius: 20px; transition: all 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active { background: rgba(255,255,255,0.15); color: #fff; }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #2C3E50 0%, #1A252F 100%);
+    padding: 48px 40px 40px; text-align: center; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle at 15% 50%, rgba(241,196,15,0.15) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(39,174,96,0.12) 0%, transparent 45%);
+  }
+  .hero-dots {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  .hero h1 { font-family: 'Fredoka One', cursive; font-size: 2.5rem; color: #fff; position: relative; line-height: 1.15; margin-bottom: 8px; }
+  .hero h1 span { color: #F1C40F; }
+  .hero p { color: rgba(255,255,255,0.7); font-size: 0.95rem; position: relative; font-weight: 600; margin-bottom: 20px; }
+  .hero-tags { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; position: relative; }
+  .hero-tag {
+    background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.2);
+    color: #fff; font-size: 0.76rem; font-weight: 700; padding: 4px 12px; border-radius: 20px;
+  }
+
+  /* SEARCH */
+  .search-wrap { display: flex; justify-content: center; padding: 22px 20px 4px; }
+  .search-box {
+    display: flex; align-items: center; background: #fff;
+    border: 2.5px solid #e0e0e0; border-radius: 40px; padding: 10px 20px;
+    width: 100%; max-width: 460px; gap: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.07); transition: all 0.2s;
+  }
+  .search-box:focus-within { border-color: var(--blue); box-shadow: 0 4px 20px rgba(26,107,138,0.18); }
+  .search-box input { border: none; outline: none; font-family: 'Nunito', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--navy); flex: 1; background: transparent; }
+  .search-box input::placeholder { color: #aaa; }
+
+  /* SECTION LABEL */
+  .section-label { text-align: center; padding: 24px 20px 4px; }
+  .section-label h2 { font-family: 'Fredoka One', cursive; font-size: 1.45rem; color: var(--navy); }
+  .section-label p { color: #888; font-size: 0.85rem; font-weight: 600; margin-top: 4px; }
+
+  /* LOADING */
+  .loading {
+    text-align: center; padding: 60px 20px;
+    font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: #aaa;
+  }
+  .spinner {
+    width: 40px; height: 40px; border: 4px solid #eee;
+    border-top-color: var(--blue); border-radius: 50%;
+    animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ERROR */
+  .error-box {
+    max-width: 500px; margin: 40px auto; background: #fff;
+    border: 2px solid #fcc; border-radius: 16px; padding: 28px;
+    text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  }
+  .error-box h3 { color: var(--red); font-family: 'Fredoka One', cursive; font-size: 1.3rem; margin-bottom: 10px; }
+  .error-box p { color: #666; font-size: 0.9rem; line-height: 1.6; }
+  .error-box code { background: #f5f5f5; padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; color: var(--red); }
+
+  /* THEME CARDS */
+  .themes-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+    gap: 16px; padding: 18px 28px 40px; max-width: 1200px; margin: 0 auto;
+  }
+  .theme-card {
+    background: #fff; border-radius: 18px; padding: 20px 16px 16px;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    cursor: pointer; transition: transform 0.18s, box-shadow 0.18s;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.07); border: 2.5px solid transparent;
+    position: relative; overflow: hidden; text-decoration: none; color: inherit;
+  }
+  .theme-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 5px; background: var(--accent); border-radius: 18px 18px 0 0;
+  }
+  .theme-card:hover { transform: translateY(-4px); box-shadow: 0 10px 28px rgba(0,0,0,0.12); border-color: var(--accent); }
+  .card-emoji { font-size: 2.1rem; margin-bottom: 9px; display: block; }
+  .card-title { font-family: 'Fredoka One', cursive; font-size: 0.95rem; color: var(--navy); line-height: 1.2; margin-bottom: 9px; }
+  .card-counts { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+  .count-chip { font-size: 0.66rem; font-weight: 800; padding: 2px 7px; border-radius: 10px; background: var(--accent); color: #fff; opacity: 0.82; }
+  .empty-chip { font-size: 0.66rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; background: #eee; color: #999; }
+
+  /* DETAIL */
+  .detail-view { display: none; max-width: 920px; margin: 0 auto; padding: 26px 28px 60px; }
+  .detail-view.active { display: block; }
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 6px; background: var(--navy);
+    color: #fff; border: none; border-radius: 20px; padding: 8px 18px;
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.84rem;
+    cursor: pointer; margin-bottom: 22px; transition: background 0.2s;
+  }
+  .back-btn:hover { background: #1a252f; }
+  .detail-header { display: flex; align-items: center; gap: 16px; margin-bottom: 26px; }
+  .detail-emoji {
+    font-size: 2.8rem; background: #f0f4f8; width: 68px; height: 68px;
+    border-radius: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .detail-title { font-family: 'Fredoka One', cursive; font-size: 1.9rem; color: var(--navy); line-height: 1.1; }
+  .detail-subtitle { color: #999; font-weight: 600; font-size: 0.88rem; margin-top: 4px; }
+
+  .categories-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(255px, 1fr)); gap: 16px; }
+  .cat-section { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 3px 14px rgba(0,0,0,0.07); }
+  .cat-header { padding: 11px 16px; display: flex; align-items: center; gap: 7px; font-family: 'Fredoka One', cursive; font-size: 0.95rem; color: #fff; }
+  .cat-body { padding: 12px 16px; }
+  .resource-item { display: flex; align-items: flex-start; gap: 8px; padding: 7px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.86rem; }
+  .resource-item:last-child { border-bottom: none; }
+  .resource-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .resource-text { line-height: 1.4; }
+  .resource-text strong { font-weight: 800; color: var(--navy); display: block; }
+  .resource-text span { color: #888; font-size: 0.8rem; }
+  .resource-link { display: inline-block; margin-top: 2px; font-size: 0.76rem; color: var(--blue); font-weight: 700; text-decoration: none; }
+  .resource-link:hover { text-decoration: underline; }
+  .empty-cat { color: #ccc; font-size: 0.83rem; font-style: italic; padding: 7px 0; font-weight: 600; }
+
+  .home-view.hidden { display: none; }
+
+  /* LAST UPDATED */
+  .last-updated { text-align: center; padding: 8px; font-size: 0.78rem; color: #bbb; font-weight: 600; }
+
+  footer { background: var(--navy); color: rgba(255,255,255,0.45); text-align: center; padding: 16px; font-size: 0.78rem; font-weight: 600; }
+  footer span { color: #F1C40F; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">🍎 <span>Kinder</span>Resource Hub</div>
+  <div class="nav-links" id="navLinks">
+    <a href="#" class="active" onclick="showHome();return false;">All Themes</a>
+  </div>
+</nav>
+
+<div class="home-view" id="homeView">
+  <div class="hero">
+    <div class="hero-dots"></div>
+    <h1>Ms. <span>Ellis’</span><br>Resource Hub</h1>
+    <p>Kindergarten · All Themes · All Resources in One Place</p>
+    <div class="hero-tags">
+      <div class="hero-tag">📚 Idea Books</div>
+      <div class="hero-tag">📖 Read Alouds</div>
+      <div class="hero-tag">🌐 Websites</div>
+      <div class="hero-tag">🎲 Games & Materials</div>
+      <div class="hero-tag">🎬 Videos</div>
+      <div class="hero-tag">🖨 Printables</div>
+      <div class="hero-tag">📋 Curriculum</div>
+    </div>
+  </div>
+
+  <div class="search-wrap">
+    <div class="search-box">
+      <span>🔍</span>
+      <input type="text" placeholder="Search themes… e.g. Community Helpers" id="searchInput" oninput="filterCards()">
+    </div>
+  </div>
+
+  <div class="section-label">
+    <h2>Choose a Theme</h2>
+    <p>Click any card to see all resources for that unit</p>
+  </div>
+
+  <div id="loadingState" class="loading">
+    <div class="spinner"></div>
+    Loading your resources from Google Sheets…
+  </div>
+
+  <div class="themes-grid" id="themesGrid" style="display:none;"></div>
+  <div class="last-updated" id="lastUpdated"></div>
+</div>
+
+<div class="detail-view" id="detailView">
+  <button class="back-btn" onclick="showHome()">← Back to All Themes</button>
+  <div class="detail-header">
+    <div class="detail-emoji" id="detailEmoji"></div>
+    <div>
+      <div class="detail-title" id="detailTitle"></div>
+      <div class="detail-subtitle" id="detailSubtitle"></div>
+    </div>
+  </div>
+  <div class="categories-grid" id="categoriesGrid"></div>
+</div>
+
+<footer>Built for <span>Kindergarten</span> · Auto-synced with Google Sheets · <span id="footerThemeCount"></span></footer>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  CONFIGURATION — Replace with your own values in Step 3
+// ─────────────────────────────────────────────────────────────
+const SHEET_ID  = 1r-WAm4pX7pvXnva7LXinzZyDuYK8qZOs;       // ← You will replace this
+const API_KEY   = AIzaSyDnbmdgjtL7O5yUO7U7lCvw1KHtTtWsJ64;         // ← You will replace this
+const SHEET_TAB = "Master Database";           // ← Must match your sheet tab name exactly
+// ─────────────────────────────────────────────────────────────
+
+const CAT_COLORS = {
+  "Mandatory Curriculum": "#C0392B",
+  "Idea Book":            "#1A6B8A",
+  "Read Aloud Book":      "#27AE60",
+  "Website":              "#8E44AD",
+  "Game/Material":        "#D35400",
+  "Video":                "#B7950B",
+  "Printable/Worksheet":  "#16A085",
+};
+
+const CAT_ICONS = {
+  "Mandatory Curriculum": "📋",
+  "Idea Book":            "📚",
+  "Read Aloud Book":      "📖",
+  "Website":              "🌐",
+  "Game/Material":        "🎲",
+  "Video":                "🎬",
+  "Printable/Worksheet":  "🖨",
+};
+
+const THEME_META = {
+  "Community Helpers":   { emoji: "👮", color: "#E74C3C" },
+  "Seasons & Weather":   { emoji: "🌤", color: "#2980B9" },
+  "Animals & Habitats":  { emoji: "🦁", color: "#27AE60" },
+  "Shapes & Patterns":   { emoji: "🔷", color: "#8E44AD" },
+  "Five Senses":         { emoji: "👅", color: "#E67E22" },
+  "Colors & Sorting":    { emoji: "🎨", color: "#E74C3C" },
+  "Numbers 1-10":        { emoji: "🔢", color: "#1ABC9C" },
+  "Numbers 11-20":       { emoji: "🔣", color: "#2980B9" },
+  "Counting & Cardinality":{ emoji:"🧮", color: "#E67E22" },
+  "Alphabet — Letters A-M":{ emoji:"🔤", color: "#27AE60" },
+  "Alphabet — Letters N-Z":{ emoji:"🅰️",  color: "#8E44AD" },
+  "Phonics: CVC Words":  { emoji: "🔊", color: "#E74C3C" },
+  "Sight Words":         { emoji: "👁",  color: "#E67E22" },
+  "Farm Animals":        { emoji: "🐄", color: "#27AE60" },
+  "Ocean Animals":       { emoji: "🐠", color: "#2980B9" },
+  "Insects & Bugs":      { emoji: "🐛", color: "#E67E22" },
+  "Plants & Growing":    { emoji: "🌱", color: "#27AE60" },
+  "Fall/Harvest":        { emoji: "🍂", color: "#E67E22" },
+  "Winter Holidays":     { emoji: "❄️",  color: "#2980B9" },
+  "Valentine's Day":     { emoji: "💝", color: "#E74C3C" },
+  "Spring":              { emoji: "🌸", color: "#E74C3C" },
+  "Fairy Tales":         { emoji: "🏰", color: "#8E44AD" },
+  "Nursery Rhymes":      { emoji: "🎵", color: "#2980B9" },
+  "Families":            { emoji: "👨‍👩‍👧", color: "#E74C3C" },
+  "Feelings & Emotions": { emoji: "😊", color: "#F1C40F" },
+  "Friendship":          { emoji: "🤝", color: "#1ABC9C" },
+  "Rules & Responsibility":{ emoji:"📌", color: "#E67E22" },
+  "Earth Day & Environment":{ emoji:"🌍", color: "#27AE60" },
+  "Transportation":      { emoji: "🚌", color: "#2980B9" },
+  "Food & Nutrition":    { emoji: "🥦", color: "#27AE60" },
+  "Space & Stars":       { emoji: "🚀", color: "#2C3E50" },
+  "Dinosaurs":           { emoji: "🦕", color: "#27AE60" },
+  "Measurement":         { emoji: "📏", color: "#E67E22" },
+  "Time":                { emoji: "🕐", color: "#8E44AD" },
+  "Money (intro)":       { emoji: "💰", color: "#27AE60" },
+  "Addition Concepts":   { emoji: "➕", color: "#E74C3C" },
+  "Subtraction Concepts":{ emoji: "➖", color: "#2980B9" },
+  "2D & 3D Shapes":      { emoji: "🔺", color: "#8E44AD" },
+  "Maps & Direction":    { emoji: "🗺",  color: "#E67E22" },
+  "Our School":          { emoji: "🏫", color: "#8E44AD" },
+};
+
+// Column indices (0-based) matching your Master Database sheet
+const COL = {
+  THEME:    1,   // Column B
+  CATEGORY: 2,   // Column C
+  TITLE:    3,   // Column D
+  AUTHOR:   4,   // Column E
+  FORMAT:   5,   // Column F
+  LOCATION: 6,   // Column G
+  NOTES:    7,   // Column H
+  STATUS:   10,  // Column K
+};
+
+let allData = [];
+let allThemes = [];
+
+// ── FETCH DATA FROM GOOGLE SHEETS ────────────────────────────
+async function loadSheetData() {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(SHEET_TAB)}?key=${API_KEY}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    const rows = (json.values || []).slice(2); // skip header rows
+    allData = rows.filter(r => r[COL.THEME] && r[COL.CATEGORY]);
+
+    // Build unique theme list preserving Sheet order
+    const seen = new Set();
+    allThemes = [];
+    allData.forEach(r => {
+      const t = r[COL.THEME];
+      if (!seen.has(t)) { seen.add(t); allThemes.push(t); }
+    });
+
+    // Also add any themes from THEME_META not yet in sheet
+    Object.keys(THEME_META).forEach(t => {
+      if (!seen.has(t)) allThemes.push(t);
+    });
+
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('themesGrid').style.display = 'grid';
+    document.getElementById('lastUpdated').textContent = `Last synced: ${new Date().toLocaleString()}`;
+    document.getElementById('footerThemeCount').textContent = `${allThemes.length} themes`;
+    renderCards(allThemes);
+
+  } catch (err) {
+    document.getElementById('loadingState').innerHTML = `
+      <div class="error-box">
+        <h3>⚠️ Couldn't load your Sheet</h3>
+        <p>Make sure you've replaced <code>YOUR_SHEET_ID_HERE</code> and <code>YOUR_API_KEY_HERE</code> in the HTML file, and that your Sheet is shared correctly.</p>
+        <p style="margin-top:10px;font-size:0.8rem;color:#aaa">Error: ${err.message}</p>
+      </div>`;
+  }
+}
+
+// ── RENDER THEME CARDS ───────────────────────────────────────
+function renderCards(themes) {
+  const grid = document.getElementById('themesGrid');
+  grid.innerHTML = '';
+  themes.forEach(theme => {
+    const meta = THEME_META[theme] || { emoji: "📁", color: "#95A5A6" };
+    const resources = allData.filter(r => r[COL.THEME] === theme && r[COL.STATUS] !== 'Archived');
+    const cats = [...new Set(resources.map(r => r[COL.CATEGORY]))];
+
+    const chips = cats.length > 0
+      ? cats.map(c => `<span class="count-chip">${CAT_ICONS[c] || ''} ${c}</span>`).join('')
+      : '<span class="empty-chip">No resources yet</span>';
+
+    const card = document.createElement('a');
+    card.href = '#';
+    card.className = 'theme-card';
+    card.style.setProperty('--accent', meta.color);
+    card.innerHTML = `
+      <span class="card-emoji">${meta.emoji}</span>
+      <div class="card-title">${theme}</div>
+      <div class="card-counts">${chips}</div>
+    `;
+    card.addEventListener('click', e => { e.preventDefault(); showDetail(theme, meta); });
+    grid.appendChild(card);
+  });
+}
+
+// ── FILTER CARDS ─────────────────────────────────────────────
+function filterCards() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = allThemes.filter(t => t.toLowerCase().includes(q));
+  renderCards(filtered);
+}
+
+// ── SHOW THEME DETAIL ────────────────────────────────────────
+function showDetail(theme, meta) {
+  document.getElementById('homeView').classList.add('hidden');
+  const dv = document.getElementById('detailView');
+  dv.classList.add('active');
+
+  document.getElementById('detailEmoji').textContent = meta.emoji;
+  document.getElementById('detailTitle').textContent = theme;
+
+  const resources = allData.filter(r => r[COL.THEME] === theme && r[COL.STATUS] !== 'Archived');
+  document.getElementById('detailSubtitle').textContent =
+    resources.length > 0
+      ? `${resources.length} resource${resources.length !== 1 ? 's' : ''} · Last synced ${new Date().toLocaleTimeString()}`
+      : 'No resources added yet — add some to your Google Sheet!';
+
+  const grid = document.getElementById('categoriesGrid');
+  grid.innerHTML = '';
+
+  Object.keys(CAT_COLORS).forEach(cat => {
+    const items = resources.filter(r => r[COL.CATEGORY] === cat);
+    const bg = CAT_COLORS[cat];
+    const icon = CAT_ICONS[cat] || '';
+
+    const sec = document.createElement('div');
+    sec.className = 'cat-section';
+
+    const header = document.createElement('div');
+    header.className = 'cat-header';
+    header.style.background = bg;
+    header.innerHTML = `${icon} ${cat}`;
+    sec.appendChild(header);
+
+    const body = document.createElement('div');
+    body.className = 'cat-body';
+
+    if (items.length === 0) {
+      body.innerHTML = '<div class="empty-cat">Nothing added yet</div>';
+    } else {
+      items.forEach(item => {
+        const title    = item[COL.TITLE]    || '';
+        const author   = item[COL.AUTHOR]   || '';
+        const location = item[COL.LOCATION] || '';
+        const notes    = item[COL.NOTES]    || '';
+        const isURL    = location.startsWith('http');
+
+        const d = document.createElement('div');
+        d.className = 'resource-item';
+        d.innerHTML = `
+          <div class="resource-dot" style="background:${bg}"></div>
+          <div class="resource-text">
+            <strong>${title}</strong>
+            ${author ? `<span>${author}</span>` : ''}
+            ${notes  ? `<span>${notes}</span>`  : ''}
+            ${isURL  ? `<a href="${location}" target="_blank" class="resource-link">🔗 Open Link</a>` : ''}
+            ${!isURL && location ? `<span style="color:#bbb;font-size:0.75rem">📍 ${location}</span>` : ''}
+          </div>
+        `;
+        body.appendChild(d);
+      });
+    }
+    sec.appendChild(body);
+    grid.appendChild(sec);
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── SHOW HOME ────────────────────────────────────────────────
+function showHome() {
+  document.getElementById('homeView').classList.remove('hidden');
+  document.getElementById('detailView').classList.remove('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+loadSheetData();
+</script>
+</body>
+</html>
